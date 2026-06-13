@@ -1,0 +1,80 @@
+import React from 'react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import type { WatchlistItem } from '../types';
+import { SeasonCard } from './SeasonCard';
+
+interface WatchlistProps {
+  items: WatchlistItem[];
+  setItems: React.Dispatch<React.SetStateAction<WatchlistItem[]>>;
+}
+
+export const Watchlist: React.FC<WatchlistProps> = ({ items, setItems }) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setItems((currentItems) => {
+        const oldIndex = currentItems.findIndex(item => item.id === active.id);
+        const newIndex = currentItems.findIndex(item => item.id === over.id);
+        return arrayMove(currentItems, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const handleRemove = (id: string) => {
+    setItems(items.filter(item => item.id !== id));
+  };
+
+  if (items.length === 0) {
+    return (
+      <div className="glass-panel" style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--text-secondary)', marginTop: '24px' }}>
+        <h3 style={{ marginBottom: '8px', color: 'var(--text-primary)' }}>Your watchlist is empty</h3>
+        <p>Search for a TV show above and add seasons to start ranking!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: '32px' }}>
+      <DndContext 
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext 
+          items={items.map(i => i.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {items.map((item, index) => (
+              <SeasonCard 
+                key={item.id} 
+                item={item} 
+                rank={index + 1} 
+                onRemove={handleRemove} 
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+    </div>
+  );
+};
