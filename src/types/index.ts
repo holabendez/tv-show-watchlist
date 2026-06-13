@@ -6,3 +6,9 @@ export interface WatchlistItem {
   season: Season;
   providers: WatchProvidersResponse | null;
 }
+
+export interface UserProfile {
+  uid: string;
+  email: string | null;
+  partnerUid: string | null;
+}
