@@ -6,7 +6,7 @@ const firebaseConfig = {
   projectId: "tv-show-watchlist-e35de",
   appId: "1:110714217856:web:4eaf9f1067b715678e0d65",
   storageBucket: "tv-show-watchlist-e35de.firebasestorage.app",
-  apiKey: "AIzaSyDAfdAPCL9MenTmKNoQIavdvOTMNKKs6W8",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "tv-show-watchlist-e35de.firebaseapp.com",
   messagingSenderId: "110714217856"
 };

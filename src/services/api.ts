@@ -1,4 +1,4 @@
-const API_KEY = 'b2e0c068b7e6a5e301d5f3a20cd5d169';
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 export interface TVShow {
