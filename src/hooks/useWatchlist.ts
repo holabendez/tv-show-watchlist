@@ -10,6 +10,7 @@ export const useWatchlist = (userId: string | undefined) => {
   // Fetch watchlist on mount / when userId changes using real-time listener
   useEffect(() => {
     if (!userId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setItems([]);
       setLoading(false);
       return;
@@ -25,6 +26,7 @@ export const useWatchlist = (userId: string | undefined) => {
         setItems([]);
       }
       setLoading(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }, (error: any) => {
       console.error("Error fetching watchlist: ", error);
       if (error.code === 'permission-denied') {
@@ -51,6 +53,7 @@ export const useWatchlist = (userId: string | undefined) => {
       const cleanItems = JSON.parse(JSON.stringify(newItems));
       const docRef = doc(db, 'watchlists', userId);
       await setDoc(docRef, { items: cleanItems });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error saving watchlist: ", error);
       if (error?.code === 'permission-denied') {

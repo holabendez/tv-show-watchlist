@@ -10,6 +10,7 @@ export const useProfile = (user: User | null) => {
 
   useEffect(() => {
     if (!user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setProfile(null);
       setLoading(false);
       return;

@@ -12,14 +12,24 @@ import { useProfile } from './hooks/useProfile';
 import type { WatchlistItem } from './types';
 import type { ShowDetails, Season, WatchProvidersResponse } from './services/api';
 import { LogOut, ListVideo, Users, HeartHandshake, Eye } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 function App() {
   const { user, loading: authLoading, loginWithGoogle, logout } = useAuth();
   const { profile, loading: profileLoading, connectPartner, disconnectPartner } = useProfile(user);
   const { items: watchlist, updateWatchlist, loading: watchlistLoading } = useWatchlist(user?.uid);
+  const { items: partnerWatchlist } = useWatchlist(profile?.partnerUid ?? undefined);
   
   const [selectedShowId, setSelectedShowId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'watchlist' | 'matches' | 'partner' | 'connect'>('watchlist');
+
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
 
   const handleAddSeason = (show: ShowDetails, season: Season, providers: WatchProvidersResponse | null) => {
     const newItem: WatchlistItem = {
@@ -31,12 +41,17 @@ function App() {
     
     if (!watchlist.some(item => item.id === newItem.id)) {
       updateWatchlist(prev => [...prev, newItem]);
+      
+      if (partnerWatchlist.some(p => p.id === newItem.id)) {
+        triggerConfetti();
+      }
     }
   };
 
   const handleAddFromPartner = (item: WatchlistItem) => {
     if (!watchlist.some(existing => existing.id === item.id)) {
       updateWatchlist(prev => [...prev, item]);
+      triggerConfetti();
     }
   };
 
