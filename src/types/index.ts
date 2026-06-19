@@ -12,3 +12,8 @@ export interface UserProfile {
   email: string | null;
   partnerUid: string | null;
 }
+
+export interface WatchedItem extends WatchlistItem {
+  liked: boolean | null;
+  watchedAt: number;
+}

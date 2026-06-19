@@ -8,6 +8,7 @@ import { Matchmaker } from './components/Matchmaker';
 import { PartnerWatchlist } from './components/PartnerWatchlist';
 import { useAuth } from './hooks/useAuth';
 import { useWatchlist } from './hooks/useWatchlist';
+import { useWatched } from './hooks/useWatched';
 import { useProfile } from './hooks/useProfile';
 import type { WatchlistItem } from './types';
 import type { ShowDetails, Season, WatchProvidersResponse } from './services/api';
@@ -19,6 +20,7 @@ function App() {
   const { profile, loading: profileLoading, connectPartner, disconnectPartner } = useProfile(user);
   const { items: watchlist, updateWatchlist, loading: watchlistLoading } = useWatchlist(user?.uid);
   const { items: partnerWatchlist } = useWatchlist(profile?.partnerUid ?? undefined);
+  const { addWatchedItem } = useWatched(user?.uid);
   
   const [selectedShowId, setSelectedShowId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'watchlist' | 'matches' | 'partner' | 'connect'>('watchlist');
@@ -53,6 +55,11 @@ function App() {
       updateWatchlist(prev => [...prev, item]);
       triggerConfetti();
     }
+  };
+
+  const handleMarkWatched = (item: WatchlistItem, liked: boolean | null) => {
+    addWatchedItem({ ...item, liked, watchedAt: Date.now() });
+    updateWatchlist(prev => prev.filter(i => i.id !== item.id));
   };
 
   if (authLoading || (user && profileLoading)) {
@@ -122,7 +129,7 @@ function App() {
             {watchlistLoading ? (
               <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Loading your watchlist...</div>
             ) : (
-              <Watchlist items={watchlist} setItems={updateWatchlist} />
+              <Watchlist items={watchlist} setItems={updateWatchlist} onMarkWatched={handleMarkWatched} />
             )}
           </>
         )}

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2 } from 'lucide-react';
+import { GripVertical, Trash2, Eye, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import type { WatchlistItem } from '../types';
 import { getImageUrl } from '../services/api';
 
@@ -9,9 +9,11 @@ interface SeasonCardProps {
   item: WatchlistItem;
   rank: number;
   onRemove: (id: string) => void;
+  onMarkWatched: (item: WatchlistItem, liked: boolean | null) => void;
 }
 
-export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove }) => {
+export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove, onMarkWatched }) => {
+  const [isMarkingWatched, setIsMarkingWatched] = useState(false);
   const {
     attributes,
     listeners,
@@ -36,7 +38,7 @@ export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove }) 
 
   return (
     <div ref={setNodeRef} style={style} className="glass-panel">
-      <div {...attributes} {...listeners} style={{ cursor: 'grab', padding: '0 8px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>
+      <div {...attributes} {...listeners} style={{ cursor: 'grab', padding: '0 8px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', touchAction: 'none' }}>
         <GripVertical />
       </div>
       
@@ -67,9 +69,33 @@ export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove }) 
         ))}
       </div>
 
-      <button className="btn btn-ghost" onClick={() => onRemove(item.id)} style={{ color: 'var(--danger-color)' }}>
-        <Trash2 size={20} />
-      </button>
+      {isMarkingWatched ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginRight: '4px' }}>Rate:</span>
+          <button className="btn btn-ghost" onClick={() => onMarkWatched(item, true)} style={{ color: 'var(--success-color)', padding: '6px' }} title="Thumbs Up">
+            <ThumbsUp size={18} />
+          </button>
+          <button className="btn btn-ghost" onClick={() => onMarkWatched(item, false)} style={{ color: 'var(--danger-color)', padding: '6px' }} title="Thumbs Down">
+            <ThumbsDown size={18} />
+          </button>
+          <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--border-glass)', margin: '0 4px' }} />
+          <button className="btn btn-ghost" onClick={() => onMarkWatched(item, null)} style={{ color: 'var(--text-secondary)', padding: '6px', fontSize: '0.9rem' }} title="Skip Rating">
+            Skip
+          </button>
+          <button className="btn btn-ghost" onClick={() => setIsMarkingWatched(false)} style={{ color: 'var(--text-secondary)', padding: '6px' }} title="Cancel">
+            <X size={18} />
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button className="btn btn-ghost" onClick={() => setIsMarkingWatched(true)} style={{ color: 'var(--accent-color)' }} title="Mark as Watched">
+            <Eye size={20} />
+          </button>
+          <button className="btn btn-ghost" onClick={() => onRemove(item.id)} style={{ color: 'var(--danger-color)' }} title="Remove">
+            <Trash2 size={20} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

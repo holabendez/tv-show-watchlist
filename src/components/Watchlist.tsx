@@ -1,5 +1,5 @@
 import React from 'react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -13,13 +13,20 @@ import { SeasonCard } from './SeasonCard';
 interface WatchlistProps {
   items: WatchlistItem[];
   setItems: React.Dispatch<React.SetStateAction<WatchlistItem[]>>;
+  onMarkWatched: (item: WatchlistItem, liked: boolean | null) => void;
 }
 
-export const Watchlist: React.FC<WatchlistProps> = ({ items, setItems }) => {
+export const Watchlist: React.FC<WatchlistProps> = ({ items, setItems, onMarkWatched }) => {
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -70,6 +77,7 @@ export const Watchlist: React.FC<WatchlistProps> = ({ items, setItems }) => {
                 item={item} 
                 rank={index + 1} 
                 onRemove={handleRemove} 
+                onMarkWatched={onMarkWatched}
               />
             ))}
           </div>
