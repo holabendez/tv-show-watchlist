@@ -109,3 +109,22 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+@keyframes pulse-accent {
+  0% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+  }
+}
+
+.nudge-pulse {
+  animation: pulse-accent 2s infinite;
+  color: var(--accent-color) !important;
+  background: rgba(139, 92, 246, 0.1) !important;
+  border-radius: 50%;
+}

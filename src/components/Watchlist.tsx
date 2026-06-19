@@ -15,9 +15,10 @@ interface WatchlistProps {
   setItems: React.Dispatch<React.SetStateAction<WatchlistItem[]>>;
   onMarkWatched: (item: WatchlistItem, liked: boolean | null) => void;
   partnerNotInterestedIds: string[];
+  partnerWatchedIds: string[];
 }
 
-export const Watchlist: React.FC<WatchlistProps> = ({ items, setItems, onMarkWatched, partnerNotInterestedIds }) => {
+export const Watchlist: React.FC<WatchlistProps> = ({ items, setItems, onMarkWatched, partnerNotInterestedIds, partnerWatchedIds }) => {
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
@@ -80,6 +81,7 @@ export const Watchlist: React.FC<WatchlistProps> = ({ items, setItems, onMarkWat
                 onRemove={handleRemove} 
                 onMarkWatched={onMarkWatched}
                 partnerNotInterested={partnerNotInterestedIds.includes(item.id)}
+                partnerWatched={partnerWatchedIds.includes(item.id)}
               />
             ))}
           </div>

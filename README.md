@@ -17,6 +17,7 @@ Additionally, it provides live streaming provider information so you know exactl
 - **Cross-Device Cloud Sync:** Securely log in with Google. Your watchlist is instantly synchronized in real-time across your phone, tablet, and desktop via Firebase Cloud Firestore.
 - **Partner Matchmaker:** Share your unique "Partner Code" to link accounts with a friend or partner. The app cross-references your watchlists and scores overlapping seasons to suggest the ultimate "Compromise Picks" for movie night.
 - **Not Interested Indicator:** Browse your partner's watchlist and flag shows you have absolutely no interest in watching. This helps your partner know they can watch those specific seasons on their own without you.
+- **Partner Watched Nudges:** If your partner marks a show as watched, your watchlist will display a subtle nudge to remind you to update your own viewing status and rating.
 - **Premium Glassmorphism UI:** Features a sleek, modern, frosted-glass design with vibrant neon gradients and smooth micro-interactions.
 
 ---

@@ -22,6 +22,8 @@ function App() {
   const { items: watchlist, updateWatchlist, loading: watchlistLoading } = useWatchlist(user?.uid);
   const { items: partnerWatchlist } = useWatchlist(profile?.partnerUid ?? undefined);
   const { items: watchedItems, addWatchedItem } = useWatched(user?.uid);
+  const { items: partnerWatchedItems } = useWatched(profile?.partnerUid ?? undefined);
+  const partnerWatchedIds = partnerWatchedItems.map(i => i.id);
   
   const [selectedShowId, setSelectedShowId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'watchlist' | 'matches' | 'partner' | 'connect'>('watchlist');
@@ -136,7 +138,13 @@ function App() {
             {watchlistLoading ? (
               <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Loading your watchlist...</div>
             ) : (
-              <Watchlist items={watchlist} setItems={updateWatchlist} onMarkWatched={handleMarkWatched} partnerNotInterestedIds={partnerProfile?.notInterested || []} />
+              <Watchlist 
+                items={watchlist} 
+                setItems={updateWatchlist} 
+                onMarkWatched={handleMarkWatched} 
+                partnerNotInterestedIds={partnerProfile?.notInterested || []} 
+                partnerWatchedIds={partnerWatchedIds}
+              />
             )}
           </>
         )}

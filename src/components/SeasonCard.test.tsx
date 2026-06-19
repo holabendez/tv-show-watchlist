@@ -96,4 +96,20 @@ describe('SeasonCard', () => {
     expect(screen.queryByTitle('Thumbs Up')).not.toBeInTheDocument();
     expect(screen.getByTitle('Mark as Watched')).toBeInTheDocument();
   });
+
+  it('renders partner watched nudge when partnerWatched is true', () => {
+    render(<SeasonCard item={mockItem} rank={1} onRemove={vi.fn()} onMarkWatched={vi.fn()} partnerWatched={true} />);
+    
+    expect(screen.getByText('👀 Partner Watched')).toBeInTheDocument();
+    const markWatchedBtn = screen.getByTitle('Mark as Watched');
+    expect(markWatchedBtn).toHaveClass('nudge-pulse');
+  });
+
+  it('hides partner watched nudge when isMarkingWatched is true', () => {
+    render(<SeasonCard item={mockItem} rank={1} onRemove={vi.fn()} onMarkWatched={vi.fn()} partnerWatched={true} />);
+    
+    fireEvent.click(screen.getByTitle('Mark as Watched'));
+    
+    expect(screen.queryByText('👀 Partner Watched')).not.toBeInTheDocument();
+  });
 });

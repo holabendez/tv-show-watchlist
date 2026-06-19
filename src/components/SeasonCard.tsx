@@ -11,9 +11,10 @@ interface SeasonCardProps {
   onRemove: (id: string) => void;
   onMarkWatched: (item: WatchlistItem, liked: boolean | null) => void;
   partnerNotInterested?: boolean;
+  partnerWatched?: boolean;
 }
 
-export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove, onMarkWatched, partnerNotInterested }) => {
+export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove, onMarkWatched, partnerNotInterested, partnerWatched }) => {
   const [isMarkingWatched, setIsMarkingWatched] = useState(false);
   const {
     attributes,
@@ -73,6 +74,24 @@ export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove, on
         </div>
       )}
 
+      {partnerWatched && !isMarkingWatched && (
+        <div style={{ 
+          fontSize: '0.8rem', 
+          backgroundColor: 'rgba(139, 92, 246, 0.2)', 
+          color: 'var(--accent-color)', 
+          padding: '4px 8px', 
+          borderRadius: '12px',
+          marginRight: '12px',
+          fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          whiteSpace: 'nowrap'
+        }} title="Your partner has marked this as watched!">
+          👀 Partner Watched
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: '8px', marginRight: '16px' }}>
         {item.providers?.flatrate?.slice(0, 3).map(p => (
           <img 
@@ -104,7 +123,7 @@ export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove, on
         </div>
       ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button className="btn btn-ghost" onClick={() => setIsMarkingWatched(true)} style={{ color: 'var(--accent-color)' }} title="Mark as Watched">
+          <button className={`btn btn-ghost ${partnerWatched ? 'nudge-pulse' : ''}`} onClick={() => setIsMarkingWatched(true)} style={{ color: 'var(--accent-color)' }} title="Mark as Watched">
             <Eye size={20} />
           </button>
           <button className="btn btn-ghost" onClick={() => onRemove(item.id)} style={{ color: 'var(--danger-color)' }} title="Remove">
