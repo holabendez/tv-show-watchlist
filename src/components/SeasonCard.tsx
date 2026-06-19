@@ -10,9 +10,10 @@ interface SeasonCardProps {
   rank: number;
   onRemove: (id: string) => void;
   onMarkWatched: (item: WatchlistItem, liked: boolean | null) => void;
+  partnerNotInterested?: boolean;
 }
 
-export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove, onMarkWatched }) => {
+export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove, onMarkWatched, partnerNotInterested }) => {
   const [isMarkingWatched, setIsMarkingWatched] = useState(false);
   const {
     attributes,
@@ -56,6 +57,21 @@ export const SeasonCard: React.FC<SeasonCardProps> = ({ item, rank, onRemove, on
         <h3 style={{ margin: '0 0 4px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.show.name}</h3>
         <p style={{ margin: 0, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.season.name}</p>
       </div>
+
+      {partnerNotInterested && (
+        <div 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            marginRight: '16px',
+            fontSize: '1.5rem',
+            cursor: 'help'
+          }}
+          title="Your partner is not interested in watching this"
+        >
+          🙈
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: '8px', marginRight: '16px' }}>
         {item.providers?.flatrate?.slice(0, 3).map(p => (

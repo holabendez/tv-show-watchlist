@@ -1,15 +1,18 @@
 import React from 'react';
 import { useWatchlist } from '../hooks/useWatchlist';
-import { Plus, Check, ListVideo } from 'lucide-react';
-import type { WatchlistItem } from '../types';
+import { Plus, Check, ListVideo, EyeOff } from 'lucide-react';
+import type { WatchlistItem, WatchedItem } from '../types';
 
 interface PartnerWatchlistProps {
   partnerUid: string;
   userWatchlist: WatchlistItem[];
   onAdd: (item: WatchlistItem) => void;
+  onMarkNotInterested: (item: WatchlistItem) => void;
+  userNotInterestedIds: string[];
+  userWatchedItems: WatchedItem[];
 }
 
-export const PartnerWatchlist: React.FC<PartnerWatchlistProps> = ({ partnerUid, userWatchlist, onAdd }) => {
+export const PartnerWatchlist: React.FC<PartnerWatchlistProps> = ({ partnerUid, userWatchlist, onAdd, onMarkNotInterested, userNotInterestedIds, userWatchedItems }) => {
   const { items: partnerItems, loading } = useWatchlist(partnerUid);
 
   if (loading) {
@@ -42,6 +45,11 @@ export const PartnerWatchlist: React.FC<PartnerWatchlistProps> = ({ partnerUid, 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {partnerItems.map((item, index) => {
           const isAdded = userWatchlist.some(ui => ui.id === item.id);
+          const isNotInterested = userNotInterestedIds.includes(item.id);
+          const isWatched = userWatchedItems.some(wi => 
+            wi.id === item.id || 
+            (wi.show.id === item.show.id && wi.season.id === item.season.id)
+          );
 
           return (
             <div key={item.id} className="glass-panel" style={{ display: 'flex', gap: '16px', padding: '16px', alignItems: 'center' }}>
@@ -60,22 +68,41 @@ export const PartnerWatchlist: React.FC<PartnerWatchlistProps> = ({ partnerUid, 
                 <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Season {item.season.season_number}</p>
               </div>
               
-              <button 
-                className={`btn ${isAdded ? 'btn-ghost' : 'btn-primary'}`}
-                onClick={() => !isAdded && onAdd(item)}
-                disabled={isAdded}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                {isAdded ? (
-                  <>
-                    <Check size={18} color="var(--success-color)" /> Added
-                  </>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {isWatched ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--success-color)', padding: '8px 16px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                    <Check size={18} /> Watched
+                  </div>
                 ) : (
                   <>
-                    <Plus size={18} /> Add to My List
+                    <button 
+                      className={`btn ${isNotInterested ? 'btn-primary' : 'btn-ghost'}`}
+                      onClick={() => onMarkNotInterested(item)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '8px', color: isNotInterested ? 'var(--bg-color)' : 'var(--danger-color)', backgroundColor: isNotInterested ? 'var(--danger-color)' : 'transparent', borderColor: isNotInterested ? 'var(--danger-color)' : 'transparent', opacity: isAdded ? 0.5 : 1 }}
+                      title={isAdded ? "You cannot mark an item as not interested if it's on your watchlist" : (isNotInterested ? "Undo Not Interested" : "Mark as Not Interested")}
+                      disabled={isAdded}
+                    >
+                      {isNotInterested ? '🙈 Undo' : <EyeOff size={18} />}
+                    </button>
+                    <button 
+                      className={`btn ${isAdded ? 'btn-ghost' : 'btn-primary'}`}
+                      onClick={() => !isAdded && onAdd(item)}
+                      disabled={isAdded}
+                      style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                    >
+                      {isAdded ? (
+                        <>
+                          <Check size={18} color="var(--success-color)" /> Added
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={18} /> Add to My List
+                        </>
+                      )}
+                    </button>
                   </>
                 )}
-              </button>
+              </div>
             </div>
           );
         })}

@@ -9,7 +9,7 @@ import { PartnerWatchlist } from './components/PartnerWatchlist';
 import { useAuth } from './hooks/useAuth';
 import { useWatchlist } from './hooks/useWatchlist';
 import { useWatched } from './hooks/useWatched';
-import { useProfile } from './hooks/useProfile';
+import { useProfile, usePartnerProfile } from './hooks/useProfile';
 import type { WatchlistItem } from './types';
 import type { ShowDetails, Season, WatchProvidersResponse } from './services/api';
 import { LogOut, ListVideo, Users, HeartHandshake, Eye } from 'lucide-react';
@@ -17,10 +17,11 @@ import confetti from 'canvas-confetti';
 
 function App() {
   const { user, loading: authLoading, loginWithGoogle, logout } = useAuth();
-  const { profile, loading: profileLoading, connectPartner, disconnectPartner } = useProfile(user);
+  const { profile, loading: profileLoading, connectPartner, disconnectPartner, toggleNotInterested, removeNotInterested } = useProfile(user);
+  const partnerProfile = usePartnerProfile(profile?.partnerUid);
   const { items: watchlist, updateWatchlist, loading: watchlistLoading } = useWatchlist(user?.uid);
   const { items: partnerWatchlist } = useWatchlist(profile?.partnerUid ?? undefined);
-  const { addWatchedItem } = useWatched(user?.uid);
+  const { items: watchedItems, addWatchedItem } = useWatched(user?.uid);
   
   const [selectedShowId, setSelectedShowId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'watchlist' | 'matches' | 'partner' | 'connect'>('watchlist');
@@ -43,6 +44,7 @@ function App() {
     
     if (!watchlist.some(item => item.id === newItem.id)) {
       updateWatchlist(prev => [...prev, newItem]);
+      removeNotInterested(newItem.id);
       
       if (partnerWatchlist.some(p => p.id === newItem.id)) {
         triggerConfetti();
@@ -53,6 +55,7 @@ function App() {
   const handleAddFromPartner = (item: WatchlistItem) => {
     if (!watchlist.some(existing => existing.id === item.id)) {
       updateWatchlist(prev => [...prev, item]);
+      removeNotInterested(item.id);
       triggerConfetti();
     }
   };
@@ -60,6 +63,10 @@ function App() {
   const handleMarkWatched = (item: WatchlistItem, liked: boolean | null) => {
     addWatchedItem({ ...item, liked, watchedAt: Date.now() });
     updateWatchlist(prev => prev.filter(i => i.id !== item.id));
+  };
+
+  const handleMarkNotInterested = (item: WatchlistItem) => {
+    toggleNotInterested(item.id);
   };
 
   if (authLoading || (user && profileLoading)) {
@@ -129,7 +136,7 @@ function App() {
             {watchlistLoading ? (
               <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Loading your watchlist...</div>
             ) : (
-              <Watchlist items={watchlist} setItems={updateWatchlist} onMarkWatched={handleMarkWatched} />
+              <Watchlist items={watchlist} setItems={updateWatchlist} onMarkWatched={handleMarkWatched} partnerNotInterestedIds={partnerProfile?.notInterested || []} />
             )}
           </>
         )}
@@ -149,7 +156,14 @@ function App() {
 
         {activeTab === 'partner' && (
           profile?.partnerUid ? (
-            <PartnerWatchlist partnerUid={profile.partnerUid} userWatchlist={watchlist} onAdd={handleAddFromPartner} />
+            <PartnerWatchlist 
+              partnerUid={profile.partnerUid} 
+              userWatchlist={watchlist} 
+              onAdd={handleAddFromPartner} 
+              onMarkNotInterested={handleMarkNotInterested}
+              userNotInterestedIds={profile?.notInterested || []}
+              userWatchedItems={watchedItems}
+            />
           ) : (
             <div className="glass-panel" style={{ padding: '40px', textAlign: 'center' }}>
               <Eye size={48} color="var(--text-secondary)" style={{ marginBottom: '16px', opacity: 0.5 }} />

@@ -71,5 +71,54 @@ export const useProfile = (user: User | null) => {
     }
   };
 
-  return { profile, loading, connectPartner, disconnectPartner };
+  const toggleNotInterested = async (itemId: string) => {
+    if (!user || !profile) return;
+    const currentNotInterested = profile.notInterested || [];
+    const newNotInterested = currentNotInterested.includes(itemId)
+      ? currentNotInterested.filter(id => id !== itemId)
+      : [...currentNotInterested, itemId];
+    
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      await setDoc(docRef, { notInterested: newNotInterested }, { merge: true });
+    } catch (error) {
+      console.error("Error toggling not interested:", error);
+    }
+  };
+
+  const removeNotInterested = async (itemId: string) => {
+    if (!user || !profile || !profile.notInterested?.includes(itemId)) return;
+    
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      const newNotInterested = profile.notInterested.filter(id => id !== itemId);
+      await setDoc(docRef, { notInterested: newNotInterested }, { merge: true });
+    } catch (error) {
+      console.error("Error removing not interested:", error);
+    }
+  };
+
+  return { profile, loading, connectPartner, disconnectPartner, toggleNotInterested, removeNotInterested };
+};
+
+export const usePartnerProfile = (partnerUid: string | null | undefined) => {
+  const [partnerProfile, setPartnerProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    if (!partnerUid) {
+      setPartnerProfile(null);
+      return;
+    }
+    const docRef = doc(db, 'users', partnerUid);
+    const unsubscribe = onSnapshot(docRef, (snap) => {
+      if (snap.exists()) {
+        setPartnerProfile(snap.data() as UserProfile);
+      } else {
+        setPartnerProfile(null);
+      }
+    });
+    return () => unsubscribe();
+  }, [partnerUid]);
+
+  return partnerProfile;
 };
