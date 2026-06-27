@@ -84,23 +84,23 @@ function App() {
   }
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
+    <div className="app-container">
+      <header className="app-header">
         <div style={{ flex: 1, textAlign: 'center' }}>
-          <h1 style={{ fontSize: '3rem', margin: '0 0 8px 0', background: 'linear-gradient(to right, var(--accent-color), #ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <h1 className="app-title">
             Season Ranker
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', margin: 0 }}>
             Curate and rank your ultimate TV season watchlist
           </p>
         </div>
-        <button onClick={logout} className="btn btn-ghost" title="Sign Out" style={{ padding: '8px', position: 'absolute', right: '20px', top: '20px' }}>
+        <button onClick={logout} className="btn btn-ghost logout-btn" title="Sign Out" style={{ padding: '8px' }}>
           <LogOut size={20} />
         </button>
       </header>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '32px', background: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '12px', border: '1px solid var(--border-glass)', overflowX: 'auto' }}>
+      <div className="tabs-container">
         <button 
           onClick={() => setActiveTab('watchlist')}
           className={`btn ${activeTab === 'watchlist' ? 'btn-primary' : 'btn-ghost'}`}

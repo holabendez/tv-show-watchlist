@@ -128,3 +128,96 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(139, 92, 246, 0.1) !important;
   border-radius: 50%;
 }
+
+/* Responsive Layout */
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.app-title {
+  font-size: 3rem;
+  margin: 0 0 8px 0;
+  background: linear-gradient(to right, var(--accent-color), #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  background: rgba(0,0,0,0.2);
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border-glass);
+  overflow-x: auto;
+}
+
+.season-card {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.season-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .app-container {
+    padding: 20px 12px;
+  }
+  
+  .app-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .logout-btn {
+    position: absolute;
+    top: -10px;
+    right: 0;
+  }
+  
+  .app-title {
+    font-size: 2rem;
+  }
+
+  .tabs-container {
+    justify-content: flex-start;
+    padding-bottom: 12px;
+  }
+  
+  .tabs-container .btn {
+    flex-shrink: 0;
+  }
+
+  .season-card {
+    flex-wrap: wrap;
+    padding: 12px 8px;
+  }
+  
+  .season-card-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
