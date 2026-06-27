@@ -10,14 +10,14 @@ Additionally, it provides live streaming provider information so you know exactl
 
 ## ✨ Key Features
 
-- **Granular Season Tracking:** Search for any TV show and select specific seasons to add to your personalized watchlist.
-- **Mark as Watched & Rate:** Keep your watchlist clean by marking seasons as "watched". You can rate them with a thumbs up or down, and they will be moved to your watched history to power future recommendations.
+- **TV Show & Movie Tracking:** Switch seamlessly between TV Shows and Movies. Search for TV seasons or standalone movies to add to your personalized watchlists.
+- **Mark as Watched & Rate:** Keep your watchlist clean by marking items as "watched". You can rate them with a thumbs up or down, and they will be moved to your watched history to power future recommendations.
 - **Drag-and-Drop Ranking:** Effortlessly prioritize what you want to watch next using a smooth, intuitive drag-and-drop interface powered by `@dnd-kit`.
-- **Live Streaming Data:** Integrates with the TMDB API to automatically display which streaming platforms (Netflix, Hulu, Max, etc.) currently offer each season in your list.
-- **Cross-Device Cloud Sync:** Securely log in with Google. Your watchlist is instantly synchronized in real-time across your phone, tablet, and desktop via Firebase Cloud Firestore.
-- **Partner Matchmaker:** Share your unique "Partner Code" to link accounts with a friend or partner. The app cross-references your watchlists and scores overlapping seasons to suggest the ultimate "Compromise Picks" for movie night.
-- **Not Interested Indicator:** Browse your partner's watchlist and flag shows you have absolutely no interest in watching. This helps your partner know they can watch those specific seasons on their own without you.
-- **Partner Watched Nudges:** If your partner marks a show as watched, your watchlist will display a subtle nudge to remind you to update your own viewing status and rating.
+- **Live Streaming Data:** Integrates with the TMDB API to automatically display which streaming platforms (Netflix, Hulu, Max, etc.) currently offer each item in your list.
+- **Cross-Device Cloud Sync:** Securely log in with Google. Your watchlists are instantly synchronized in real-time across your phone, tablet, and desktop via Firebase Cloud Firestore.
+- **Partner Matchmaker:** Share your unique "Partner Code" to link accounts with a friend or partner. The app cross-references your watchlists and scores overlapping seasons/movies to suggest the ultimate "Compromise Picks" for movie night.
+- **Not Interested Indicator:** Browse your partner's watchlist and flag shows or movies you have absolutely no interest in watching. This helps your partner know they can watch those specific items on their own without you.
+- **Partner Watched Nudges:** If your partner marks a show or movie as watched, your watchlist will display a subtle nudge to remind you to update your own viewing status and rating.
 - **Premium Glassmorphism UI:** Features a sleek, modern, frosted-glass design with vibrant neon gradients and smooth micro-interactions.
 
 ---

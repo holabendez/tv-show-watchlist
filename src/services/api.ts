@@ -9,6 +9,14 @@ export interface TVShow {
   first_air_date: string;
 }
 
+export interface Movie {
+  id: number;
+  title: string;
+  poster_path: string | null;
+  overview: string;
+  release_date: string;
+}
+
 export interface Season {
   id: number;
   season_number: number;
@@ -53,6 +61,19 @@ export const getShowDetails = async (showId: number): Promise<ShowDetails> => {
 // Returns US watch providers by default
 export const getSeasonWatchProviders = async (showId: number, seasonNumber: number, countryCode: string = 'US'): Promise<WatchProvidersResponse | null> => {
   const response = await fetch(`${BASE_URL}/tv/${showId}/season/${seasonNumber}/watch/providers?api_key=${API_KEY}`);
+  const data = await response.json();
+  return data.results?.[countryCode] || null;
+};
+
+export const searchMovies = async (query: string): Promise<Movie[]> => {
+  if (!query) return [];
+  const response = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+  const data = await response.json();
+  return data.results || [];
+};
+
+export const getMovieWatchProviders = async (movieId: number, countryCode: string = 'US'): Promise<WatchProvidersResponse | null> => {
+  const response = await fetch(`${BASE_URL}/movie/${movieId}/watch/providers?api_key=${API_KEY}`);
   const data = await response.json();
   return data.results?.[countryCode] || null;
 };

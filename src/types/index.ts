@@ -1,4 +1,4 @@
-import type { ShowDetails, Season, WatchProvidersResponse } from '../services/api';
+import type { ShowDetails, Season, WatchProvidersResponse, Movie } from '../services/api';
 
 export interface WatchlistItem {
   id: string; // unique ID, e.g., showId-seasonId
@@ -15,6 +15,17 @@ export interface UserProfile {
 }
 
 export interface WatchedItem extends WatchlistItem {
+  liked: boolean | null;
+  watchedAt: number;
+}
+
+export interface MovieWatchlistItem {
+  id: string; // unique ID, e.g., movieId
+  movie: Movie;
+  providers: WatchProvidersResponse | null;
+}
+
+export interface WatchedMovieItem extends MovieWatchlistItem {
   liked: boolean | null;
   watchedAt: number;
 }

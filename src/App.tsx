@@ -1,18 +1,25 @@
 import { useState } from 'react';
 import { SearchBox } from './components/SearchBox';
+import { MovieSearchBox } from './components/MovieSearchBox';
 import { ShowDetailsModal } from './components/ShowDetailsModal';
 import { Watchlist } from './components/Watchlist';
+import { MovieWatchlist } from './components/MovieWatchlist';
 import { Login } from './components/Login';
 import { PartnerConnect } from './components/PartnerConnect';
 import { Matchmaker } from './components/Matchmaker';
+import { MovieMatchmaker } from './components/MovieMatchmaker';
 import { PartnerWatchlist } from './components/PartnerWatchlist';
+import { PartnerMovieWatchlist } from './components/PartnerMovieWatchlist';
 import { useAuth } from './hooks/useAuth';
 import { useWatchlist } from './hooks/useWatchlist';
+import { useMovieWatchlist } from './hooks/useMovieWatchlist';
 import { useWatched } from './hooks/useWatched';
+import { useMovieWatched } from './hooks/useMovieWatched';
 import { useProfile, usePartnerProfile } from './hooks/useProfile';
-import type { WatchlistItem } from './types';
-import type { ShowDetails, Season, WatchProvidersResponse } from './services/api';
-import { LogOut, ListVideo, Users, HeartHandshake, Eye } from 'lucide-react';
+import type { WatchlistItem, MovieWatchlistItem } from './types';
+import { getMovieWatchProviders } from './services/api';
+import type { ShowDetails, Season, WatchProvidersResponse, Movie } from './services/api';
+import { LogOut, ListVideo, Users, HeartHandshake, Eye, Film } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 function App() {
@@ -24,9 +31,16 @@ function App() {
   const { items: watchedItems, addWatchedItem } = useWatched(user?.uid);
   const { items: partnerWatchedItems } = useWatched(profile?.partnerUid ?? undefined);
   const partnerWatchedIds = partnerWatchedItems.map(i => i.id);
+
+  const { items: movieWatchlist, updateWatchlist: updateMovieWatchlist, loading: movieWatchlistLoading } = useMovieWatchlist(user?.uid);
+  const { items: partnerMovieWatchlist } = useMovieWatchlist(profile?.partnerUid ?? undefined);
+  const { items: watchedMovies, addWatchedItem: addWatchedMovie } = useMovieWatched(user?.uid);
+  const { items: partnerWatchedMovies } = useMovieWatched(profile?.partnerUid ?? undefined);
+  const partnerWatchedMovieIds = partnerWatchedMovies.map(i => i.id);
   
   const [selectedShowId, setSelectedShowId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'watchlist' | 'matches' | 'partner' | 'connect'>('watchlist');
+  const [mediaType, setMediaType] = useState<'tv' | 'movie'>('tv');
 
   const triggerConfetti = () => {
     confetti({
@@ -67,7 +81,38 @@ function App() {
     updateWatchlist(prev => prev.filter(i => i.id !== item.id));
   };
 
-  const handleMarkNotInterested = (item: WatchlistItem) => {
+  const handleAddMovie = async (movie: Movie) => {
+    const providers = await getMovieWatchProviders(movie.id);
+    const newItem: MovieWatchlistItem = {
+      id: `movie-${movie.id}`,
+      movie,
+      providers
+    };
+    
+    if (!movieWatchlist.some(item => item.id === newItem.id)) {
+      updateMovieWatchlist(prev => [...prev, newItem]);
+      removeNotInterested(newItem.id);
+      
+      if (partnerMovieWatchlist.some(p => p.id === newItem.id)) {
+        triggerConfetti();
+      }
+    }
+  };
+
+  const handleAddMovieFromPartner = (item: MovieWatchlistItem) => {
+    if (!movieWatchlist.some(existing => existing.id === item.id)) {
+      updateMovieWatchlist(prev => [...prev, item]);
+      removeNotInterested(item.id);
+      triggerConfetti();
+    }
+  };
+
+  const handleMarkMovieWatched = (item: MovieWatchlistItem, liked: boolean | null) => {
+    addWatchedMovie({ ...item, liked, watchedAt: Date.now() });
+    updateMovieWatchlist(prev => prev.filter(i => i.id !== item.id));
+  };
+
+  const handleMarkNotInterested = (item: { id: string }) => {
     toggleNotInterested(item.id);
   };
 
@@ -88,10 +133,10 @@ function App() {
       <header className="app-header">
         <div style={{ flex: 1, textAlign: 'center' }}>
           <h1 className="app-title">
-            Season Ranker
+            Watchlist Ranker
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', margin: 0 }}>
-            Curate and rank your ultimate TV season watchlist
+            Curate and rank your ultimate TV and Movie watchlists
           </p>
         </div>
         <button onClick={logout} className="btn btn-ghost logout-btn" title="Sign Out" style={{ padding: '8px' }}>
@@ -131,8 +176,27 @@ function App() {
         </button>
       </div>
 
+      {activeTab !== 'connect' && (
+        <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0', gap: '8px' }}>
+          <button 
+            onClick={() => setMediaType('tv')}
+            className={`btn ${mediaType === 'tv' ? 'btn-primary' : 'btn-ghost'}`}
+            style={{ borderRadius: '20px', padding: '6px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <ListVideo size={16} /> TV Shows
+          </button>
+          <button 
+            onClick={() => setMediaType('movie')}
+            className={`btn ${mediaType === 'movie' ? 'btn-primary' : 'btn-ghost'}`}
+            style={{ borderRadius: '20px', padding: '6px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <Film size={16} /> Movies
+          </button>
+        </div>
+      )}
+
       <main>
-        {activeTab === 'watchlist' && (
+        {activeTab === 'watchlist' && mediaType === 'tv' && (
           <>
             <SearchBox onSelectShow={setSelectedShowId} />
             {watchlistLoading ? (
@@ -149,9 +213,28 @@ function App() {
           </>
         )}
 
+        {activeTab === 'watchlist' && mediaType === 'movie' && (
+          <>
+            <MovieSearchBox onSelectMovie={handleAddMovie} />
+            {movieWatchlistLoading ? (
+              <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Loading your movie watchlist...</div>
+            ) : (
+              <MovieWatchlist 
+                items={movieWatchlist} 
+                setItems={updateMovieWatchlist} 
+                onMarkWatched={handleMarkMovieWatched} 
+                partnerNotInterestedIds={partnerProfile?.notInterested || []} 
+                partnerWatchedIds={partnerWatchedMovieIds}
+              />
+            )}
+          </>
+        )}
+
         {activeTab === 'matches' && (
           profile?.partnerUid ? (
-            <Matchmaker partnerUid={profile.partnerUid} userWatchlist={watchlist} />
+            mediaType === 'tv' ? 
+              <Matchmaker partnerUid={profile.partnerUid} userWatchlist={watchlist} /> :
+              <MovieMatchmaker partnerUid={profile.partnerUid} userWatchlist={movieWatchlist} />
           ) : (
             <div className="glass-panel" style={{ padding: '40px', textAlign: 'center' }}>
               <HeartHandshake size={48} color="var(--text-secondary)" style={{ marginBottom: '16px', opacity: 0.5 }} />
@@ -164,14 +247,25 @@ function App() {
 
         {activeTab === 'partner' && (
           profile?.partnerUid ? (
-            <PartnerWatchlist 
-              partnerUid={profile.partnerUid} 
-              userWatchlist={watchlist} 
-              onAdd={handleAddFromPartner} 
-              onMarkNotInterested={handleMarkNotInterested}
-              userNotInterestedIds={profile?.notInterested || []}
-              userWatchedItems={watchedItems}
-            />
+            mediaType === 'tv' ? (
+              <PartnerWatchlist 
+                partnerUid={profile.partnerUid} 
+                userWatchlist={watchlist} 
+                onAdd={handleAddFromPartner} 
+                onMarkNotInterested={handleMarkNotInterested}
+                userNotInterestedIds={profile?.notInterested || []}
+                userWatchedItems={watchedItems}
+              />
+            ) : (
+              <PartnerMovieWatchlist 
+                partnerUid={profile.partnerUid} 
+                userWatchlist={movieWatchlist} 
+                onAdd={handleAddMovieFromPartner} 
+                onMarkNotInterested={handleMarkNotInterested}
+                userNotInterestedIds={profile?.notInterested || []}
+                userWatchedItems={watchedMovies}
+              />
+            )
           ) : (
             <div className="glass-panel" style={{ padding: '40px', textAlign: 'center' }}>
               <Eye size={48} color="var(--text-secondary)" style={{ marginBottom: '16px', opacity: 0.5 }} />
