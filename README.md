@@ -1,4 +1,4 @@
-# Watchlist Ranker 📺
+# Watchlist Ranker 📺 (v0.1.0)
 
 **Watchlist Ranker** is a modern, responsive web application designed for television enthusiasts who want granular control over their viewing priorities. Instead of simply tracking shows, this app allows users to rank specific *Seasons* of a show against each other (e.g., ranking *Lost* Season 3 ahead of *Friends* Season 2, but behind *Friends* Season 1).
 
