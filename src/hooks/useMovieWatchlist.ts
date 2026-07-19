@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { deduplicateResponse } from '../services/api';
 import type { MovieWatchlistItem } from '../types';
 
 export const useMovieWatchlist = (userId: string | undefined) => {
@@ -21,7 +22,16 @@ export const useMovieWatchlist = (userId: string | undefined) => {
     
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        setItems(docSnap.data().items || []);
+        const rawItems = docSnap.data().items || [];
+        // Deduplicate providers on the fly for existing DB items
+        const cleanItems = rawItems.map((item: MovieWatchlistItem) => {
+          if (!item.providers) return item;
+          return {
+            ...item,
+            providers: deduplicateResponse(item.providers)
+          };
+        });
+        setItems(cleanItems);
       } else {
         setItems([]);
       }

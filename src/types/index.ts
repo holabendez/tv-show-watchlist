@@ -5,6 +5,8 @@ export interface WatchlistItem {
   show: ShowDetails;
   season: Season;
   providers: WatchProvidersResponse | null;
+  addedAt?: number;
+  providersUpdatedAt?: number;
 }
 
 export interface UserProfile {
@@ -12,6 +14,7 @@ export interface UserProfile {
   email: string | null;
   partnerUid: string | null;
   notInterested?: string[];
+  lastVisitedAt?: number;
 }
 
 export interface WatchedItem extends WatchlistItem {
@@ -23,6 +26,8 @@ export interface MovieWatchlistItem {
   id: string; // unique ID, e.g., movieId
   movie: Movie;
   providers: WatchProvidersResponse | null;
+  addedAt?: number;
+  providersUpdatedAt?: number;
 }
 
 export interface WatchedMovieItem extends MovieWatchlistItem {

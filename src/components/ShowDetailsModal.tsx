@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X, Plus } from 'lucide-react';
-import { getShowDetails, getSeasonWatchProviders, getImageUrl } from '../services/api';
+import { getShowDetails, getSeasonWatchProviders, getShowWatchProviders, getImageUrl } from '../services/api';
 import type { ShowDetails, Season, WatchProvidersResponse } from '../services/api';
 
 interface ShowDetailsModalProps {
@@ -20,11 +20,20 @@ export const ShowDetailsModal: React.FC<ShowDetailsModalProps> = ({ showId, onCl
       const data = await getShowDetails(showId);
       setShow(data);
       
+      // Fetch providers for the overall show as a fallback
+      const showProviders = await getShowWatchProviders(showId);
+
       // Fetch providers for each season
       const providers: Record<number, WatchProvidersResponse | null> = {};
       await Promise.all(data.seasons.map(async (season) => {
         // Skip season 0 (Specials) usually unless wanted, but let's just fetch it
-        const seasonProviders = await getSeasonWatchProviders(showId, season.season_number);
+        let seasonProviders = await getSeasonWatchProviders(showId, season.season_number);
+        
+        // TMDB often lacks season-level provider data. If it's missing or empty, fallback to show-level providers
+        if (!seasonProviders || (!seasonProviders.flatrate?.length && !seasonProviders.buy?.length && !seasonProviders.rent?.length)) {
+          seasonProviders = showProviders;
+        }
+
         providers[season.id] = seasonProviders;
       }));
       setProvidersMap(providers);

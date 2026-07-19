@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from './services/firebase';
 import { SearchBox } from './components/SearchBox';
 import { MovieSearchBox } from './components/MovieSearchBox';
 import { ShowDetailsModal } from './components/ShowDetailsModal';
@@ -16,6 +18,7 @@ import { useMovieWatchlist } from './hooks/useMovieWatchlist';
 import { useWatched } from './hooks/useWatched';
 import { useMovieWatched } from './hooks/useMovieWatched';
 import { useProfile, usePartnerProfile } from './hooks/useProfile';
+import { useProviderRefresh } from './hooks/useProviderRefresh';
 import type { WatchlistItem, MovieWatchlistItem } from './types';
 import { getMovieWatchProviders } from './services/api';
 import type { ShowDetails, Season, WatchProvidersResponse, Movie } from './services/api';
@@ -38,9 +41,21 @@ function App() {
   const { items: partnerWatchedMovies } = useMovieWatched(profile?.partnerUid ?? undefined);
   const partnerWatchedMovieIds = partnerWatchedMovies.map(i => i.id);
   
+  // Start the background refresh process
+  useProviderRefresh(user?.uid, watchlist, movieWatchlist, updateWatchlist, updateMovieWatchlist);
+  
   const [selectedShowId, setSelectedShowId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'watchlist' | 'matches' | 'partner' | 'connect'>('watchlist');
   const [mediaType, setMediaType] = useState<'tv' | 'movie'>('tv');
+  const [previousVisitTime, setPreviousVisitTime] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (profile && previousVisitTime === null) {
+      setPreviousVisitTime(profile.lastVisitedAt || 0);
+      const docRef = doc(db, 'users', profile.uid);
+      setDoc(docRef, { lastVisitedAt: Date.now() }, { merge: true }).catch(console.error);
+    }
+  }, [profile, previousVisitTime]);
 
   const triggerConfetti = () => {
     confetti({
@@ -55,7 +70,9 @@ function App() {
       id: `${show.id}-${season.id}`,
       show,
       season,
-      providers
+      providers,
+      addedAt: Date.now(),
+      providersUpdatedAt: Date.now()
     };
     
     if (!watchlist.some(item => item.id === newItem.id)) {
@@ -70,7 +87,7 @@ function App() {
 
   const handleAddFromPartner = (item: WatchlistItem) => {
     if (!watchlist.some(existing => existing.id === item.id)) {
-      updateWatchlist(prev => [...prev, item]);
+      updateWatchlist(prev => [...prev, { ...item, addedAt: Date.now(), providersUpdatedAt: Date.now() }]);
       removeNotInterested(item.id);
       triggerConfetti();
     }
@@ -86,7 +103,9 @@ function App() {
     const newItem: MovieWatchlistItem = {
       id: `movie-${movie.id}`,
       movie,
-      providers
+      providers,
+      addedAt: Date.now(),
+      providersUpdatedAt: Date.now()
     };
     
     if (!movieWatchlist.some(item => item.id === newItem.id)) {
@@ -101,7 +120,7 @@ function App() {
 
   const handleAddMovieFromPartner = (item: MovieWatchlistItem) => {
     if (!movieWatchlist.some(existing => existing.id === item.id)) {
-      updateMovieWatchlist(prev => [...prev, item]);
+      updateMovieWatchlist(prev => [...prev, { ...item, addedAt: Date.now(), providersUpdatedAt: Date.now() }]);
       removeNotInterested(item.id);
       triggerConfetti();
     }
@@ -255,6 +274,7 @@ function App() {
                 onMarkNotInterested={handleMarkNotInterested}
                 userNotInterestedIds={profile?.notInterested || []}
                 userWatchedItems={watchedItems}
+                previousVisitTime={previousVisitTime}
               />
             ) : (
               <PartnerMovieWatchlist 
@@ -264,6 +284,7 @@ function App() {
                 onMarkNotInterested={handleMarkNotInterested}
                 userNotInterestedIds={profile?.notInterested || []}
                 userWatchedItems={watchedMovies}
+                previousVisitTime={previousVisitTime}
               />
             )
           ) : (

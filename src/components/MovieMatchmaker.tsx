@@ -82,6 +82,21 @@ export const MovieMatchmaker: React.FC<MovieMatchmakerProps> = ({ partnerUid, us
               <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
                 {match.item.movie.release_date ? match.item.movie.release_date.substring(0, 4) : ''}
               </p>
+              
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                {match.item.providers?.flatrate?.slice(0, 3).map(p => (
+                  <img 
+                    key={p.provider_id} 
+                    src={`https://image.tmdb.org/t/p/original${p.logo_path}`} 
+                    alt={p.provider_name}
+                    title={p.provider_name}
+                    style={{ width: '24px', height: '24px', borderRadius: '4px' }}
+                  />
+                ))}
+                {(!match.item.providers?.flatrate || match.item.providers.flatrate.length === 0) && (
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>No streaming data</span>
+                )}
+              </div>
             </div>
             
             <div style={{ textAlign: 'right', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>

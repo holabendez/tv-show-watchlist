@@ -80,6 +80,21 @@ export const Matchmaker: React.FC<MatchmakerProps> = ({ partnerUid, userWatchlis
             <div style={{ flex: 1 }}>
               <h3 style={{ margin: '0 0 4px 0', fontSize: '1.2rem' }}>{match.item.show.name}</h3>
               <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Season {match.item.season.season_number}</p>
+              
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                {match.item.providers?.flatrate?.slice(0, 3).map(p => (
+                  <img 
+                    key={p.provider_id} 
+                    src={`https://image.tmdb.org/t/p/original${p.logo_path}`} 
+                    alt={p.provider_name}
+                    title={p.provider_name}
+                    style={{ width: '24px', height: '24px', borderRadius: '4px' }}
+                  />
+                ))}
+                {(!match.item.providers?.flatrate || match.item.providers.flatrate.length === 0) && (
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>No streaming data</span>
+                )}
+              </div>
             </div>
             
             <div style={{ textAlign: 'right', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>

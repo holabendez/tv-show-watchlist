@@ -10,6 +10,7 @@ interface PartnerMovieWatchlistProps {
   onMarkNotInterested: (item: MovieWatchlistItem) => void;
   userNotInterestedIds: string[];
   userWatchedItems: WatchedMovieItem[];
+  previousVisitTime: number | null;
 }
 
 export const PartnerMovieWatchlist: React.FC<PartnerMovieWatchlistProps> = ({ 
@@ -18,7 +19,8 @@ export const PartnerMovieWatchlist: React.FC<PartnerMovieWatchlistProps> = ({
   onAdd, 
   onMarkNotInterested,
   userNotInterestedIds,
-  userWatchedItems
+  userWatchedItems,
+  previousVisitTime
 }) => {
   const { items: partnerWatchlist, loading } = useMovieWatchlist(partnerUid);
 
@@ -46,6 +48,7 @@ export const PartnerMovieWatchlist: React.FC<PartnerMovieWatchlistProps> = ({
           const inMyList = userWatchlistIds.includes(item.id);
           const isNotInterested = userNotInterestedIds.includes(item.id);
           const hasWatched = userWatchedIds.includes(item.id);
+          const isNew = item.addedAt && previousVisitTime !== null && item.addedAt > previousVisitTime;
 
           return (
             <div key={item.id} className="glass-panel" style={{ 
@@ -76,6 +79,11 @@ export const PartnerMovieWatchlist: React.FC<PartnerMovieWatchlistProps> = ({
                   <h3 style={{ margin: '0 0 4px 0', fontSize: '1.2rem', textDecoration: isNotInterested ? 'line-through' : 'none' }}>
                     {item.movie.title}
                   </h3>
+                  {isNew && (
+                    <span style={{ background: 'var(--accent-color)', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                      New
+                    </span>
+                  )}
                   {inMyList && (
                     <span style={{ fontSize: '0.8rem', backgroundColor: 'rgba(139, 92, 246, 0.2)', color: 'var(--accent-color)', padding: '2px 6px', borderRadius: '4px' }}>
                       In your list

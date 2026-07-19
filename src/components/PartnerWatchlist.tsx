@@ -10,9 +10,10 @@ interface PartnerWatchlistProps {
   onMarkNotInterested: (item: WatchlistItem) => void;
   userNotInterestedIds: string[];
   userWatchedItems: WatchedItem[];
+  previousVisitTime: number | null;
 }
 
-export const PartnerWatchlist: React.FC<PartnerWatchlistProps> = ({ partnerUid, userWatchlist, onAdd, onMarkNotInterested, userNotInterestedIds, userWatchedItems }) => {
+export const PartnerWatchlist: React.FC<PartnerWatchlistProps> = ({ partnerUid, userWatchlist, onAdd, onMarkNotInterested, userNotInterestedIds, userWatchedItems, previousVisitTime }) => {
   const { items: partnerItems, loading } = useWatchlist(partnerUid);
 
   if (loading) {
@@ -50,6 +51,7 @@ export const PartnerWatchlist: React.FC<PartnerWatchlistProps> = ({ partnerUid, 
             wi.id === item.id || 
             (wi.show.id === item.show.id && wi.season.id === item.season.id)
           );
+          const isNew = item.addedAt && previousVisitTime !== null && item.addedAt > previousVisitTime;
 
           return (
             <div key={item.id} className="glass-panel" style={{ display: 'flex', gap: '16px', padding: '16px', alignItems: 'center' }}>
@@ -64,7 +66,14 @@ export const PartnerWatchlist: React.FC<PartnerWatchlistProps> = ({ partnerUid, 
               />
               
               <div style={{ flex: 1 }}>
-                <h3 style={{ margin: '0 0 4px 0', fontSize: '1.2rem' }}>{item.show.name}</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem' }}>{item.show.name}</h3>
+                  {isNew && (
+                    <span style={{ background: 'var(--accent-color)', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                      New
+                    </span>
+                  )}
+                </div>
                 <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Season {item.season.season_number}</p>
               </div>
               

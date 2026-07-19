@@ -1,6 +1,6 @@
-# Season Ranker 📺
+# Watchlist Ranker 📺
 
-**Season Ranker** is a modern, responsive web application designed for television enthusiasts who want granular control over their viewing priorities. Instead of simply tracking shows, this app allows users to rank specific *Seasons* of a show against each other (e.g., ranking *Lost* Season 3 ahead of *Friends* Season 2, but behind *Friends* Season 1).
+**Watchlist Ranker** is a modern, responsive web application designed for television enthusiasts who want granular control over their viewing priorities. Instead of simply tracking shows, this app allows users to rank specific *Seasons* of a show against each other (e.g., ranking *Lost* Season 3 ahead of *Friends* Season 2, but behind *Friends* Season 1).
 
 Additionally, it provides live streaming provider information so you know exactly where to watch, and features an intelligent **Partner Matchmaker** to mathematically calculate the best viewing compromise for couples and friends.
 
@@ -39,8 +39,8 @@ To run this project locally on your machine, follow these steps:
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/holabendez/tv-show-watchlist.git
-cd tv-show-watchlist
+git clone https://github.com/holabendez/watchlist-ranker.git
+cd watchlist-ranker
 ```
 
 ### 2. Install dependencies
