@@ -27,6 +27,7 @@ describe('PartnerMovieWatchlist', () => {
       onMarkNotInterested: vi.fn(),
       userNotInterestedIds: [],
       userWatchedItems: [],
+      previousVisitTime: null,
       ...propsOverrides,
     };
 

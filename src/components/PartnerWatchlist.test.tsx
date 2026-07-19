@@ -28,6 +28,7 @@ describe('PartnerWatchlist', () => {
       onMarkNotInterested: vi.fn(),
       userNotInterestedIds: [],
       userWatchedItems: [],
+      previousVisitTime: null,
       ...propsOverrides,
     };
 
